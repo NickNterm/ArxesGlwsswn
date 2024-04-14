@@ -41,11 +41,6 @@ price a
 
 
 -----------------------------------------------------------------------------------------
--- Γράψτε μία συνάρτηση ab σε Haskell η οποία θα δέχεται ως παράμετρο έναν θετικό ακέραιο αριθ-
--- μό n και θα επιστρέφει ένα ζεύγος ακεραίων (a, b), τέτοια ώστε 1 ≤ a ≤ b, a · b = n και το b − a
--- να είναι το ελάχιστο δυνατό. Ο τύπος της συνάρτησης ab θα πρέπει να είναι Int->(Int,Int).
--- Μπορείτε να υποθέσετε ότι n είναι μη αρνητικός ακέραιος αριθμός. Δεν επιτρέπεται να χρησι-
--- μοποιήσετε λίστες.
 -- ASKHSH 2
 
 -- Idea: We are going to get the sqrt of the number n
@@ -126,12 +121,21 @@ daysInMonth mm
 -- ASKHSH 4
 
 deleteIntI :: [Int]->[Int]->[Int]
+deleteIntI s r = deleteIntIHlp s r 1
 
-deleteIntI s r = [-2024] 
-
-
-
-
+-- Helper function that keeps the index of 
+-- the elements that we want to delete
+deleteIntIHlp :: [Int]->[Int]->Int->[Int]
+-- if the r list is empty then we return the s list
+deleteIntIHlp s [] i = s
+-- if the s list is empty then we again return the s list
+deleteIntIHlp [] r i = []
+-- Else we check if the i element is on the r list
+deleteIntIHlp (h1:t1) (h2:t2) i
+    -- if it is we delete it 
+    | i == h2 = deleteIntIHlp t1 t2 (i+1)
+    -- else skip this index
+    | otherwise = h2:deleteIntIHlp t1 (h2:t2) (i+1)
 
 
 -----------------------------------------------------------------------------------------
@@ -139,8 +143,24 @@ deleteIntI s r = [-2024]
 -- ASKHSH 5
 
 smooth :: [Int]->Int->[Int]
+smooth s@(h1:t1) k
+    -- in case the length of the list is smaller than k
+    -- return an empty list, ( no reason to smooth it )
+    | length s < k = []
+    -- otherwise we use the smoothHlp to get the averange of
+    -- the first k elements. Then we keep it as the h1
+    -- of the list that we return. afterwards we call 
+    -- smooth to the rest of the list
+    | otherwise = avrg:smooth t1 k
+        where avrg = smoothHlp s k 1 0
 
-smooth s k =  [-2025.. -2000]
+-- this function takes the list and the k, i and it gets
+-- the averange for those items on the list
+smoothHlp :: [Int]->Int->Int->Int->Int
+smoothHlp [] k i c = c `div` k 
+smoothHlp (h1:t1) k i c
+    | i == k = c `div` k
+    | i < k = smoothHlp t1 k (i+1) (c+h1)
 
 
 
@@ -151,13 +171,24 @@ smooth s k =  [-2025.. -2000]
 -- ASKHSH 6
 
 partition :: String->[[String]]
+partition w =  split w
 
-partition w = [["-2024"]] 
+split :: String->[String]
+split (a:b:t) = (a:r,b:s)
+    where [r,s] = split t
+split s = [s,""]
 
+partitionHlp :: String->Int->[[String]]
+partitionHlp w k
+    | k == length w = [[w]]
+    | k > length w = [[w]]
+    | otherwise = [partitionHlp2 (take k w) (drop k w) k] ++ partitionHlp w (k+1)
 
-
-
-
+partitionHlp2 :: String->String->Int->[String]
+partitionHlp2 s w k
+    | k == length w = [w]
+    | k > length w = [w]
+    | otherwise = s:(take k w):[drop k w] ++ partitionHlp2 s w (k+1)
 
 -----------------------------------------------------------------------------------------
 
@@ -165,8 +196,48 @@ partition w = [["-2024"]]
 
 move :: Eq u => [u]->u->Int->[u]
 
-move s x n = []
+move s x n 
+    -- if the element x is not in the list s then return the list s
+    | findInList s x == False = s
+    -- if n == 0 then just remove the first element x
+    | n == 0 = removeFirstxItem s x
+    -- Fact: if the n is negative, then the index of x is MINUS the |n|
+    --       if the n is positive, then the index of x is PLUS the  |n|
+    -- so either way we move the element x by |n| and the sign is the direction we move
+    -- that way we don't need 2 different lines to move to right/left and we only need one
+    | otherwise =  insertAt (removeFirstxItem s x) x (index s x + n)
 
+-- This returns the index of the element x in the list s
+index :: Eq u => [u]->u->Int
+index s x = indexHlp s x 0
+
+-- We use a helper to count the index of the element x
+indexHlp :: Eq u => [u]->u->Int->Int
+indexHlp [] x i = -1
+indexHlp (h1:t1) x i
+    | h1 == x = i
+    | otherwise = indexHlp t1 x (i+1)
+
+-- This Inserts the element x at the index n and returns the list
+insertAt :: Eq u => [u]->u->Int->[u]
+insertAt [] x n = [x]
+insertAt (h1:t1) x n
+    | n == 0 = x:h1:t1
+    | otherwise = h1:insertAt t1 x (n-1)
+
+-- This removes the first element x from the list s
+removeFirstxItem :: Eq u => [u]->u->[u]
+removeFirstxItem [] x = []
+removeFirstxItem (h1:t1) x
+    | h1 == x = t1
+    | otherwise = h1:removeFirstxItem t1 x
+
+-- This function checks if the element x is in the list s
+findInList :: Eq u => [u]->u->Bool
+findInList [] x = False
+findInList (h1:t1) x
+    | h1 == x = True
+    | otherwise = findInList t1 x
 
 
 
@@ -176,8 +247,17 @@ move s x n = []
 -- ASKHSH 8
 
 inverse :: (Int->Int)->(Int->Int)
+-- here just return the helper
+inverse f = \n -> inverseHlp f n 0
 
-inverse f = \n -> -2024
+inverseHlp :: (Int->Int)->Int->Int->Int
+inverseHlp f n i
+    -- if the f(i) == n then return i
+    | f i == n = i
+    -- else increment i and call the function again
+    -- that way you are going to find the smallest i
+    -- that is positive and f(i) == n
+    | otherwise = inverseHlp f n (i+1)
 
 
 
@@ -188,12 +268,20 @@ inverse f = \n -> -2024
 -- ASKHSH 9
 
 sumfab :: (Int->Int->Int->Int)->Int->Int->Int
-
-sumfab f a b = -2024
-
-
+-- just user the helper to use the k as the a as first
+sumfab f a b = sumfabHlp f a b a 
 
 
+sumfabHlp :: (Int->Int->Int->Int)->Int->Int->Int->Int
+sumfabHlp f a b i
+    -- if a == b then return 0
+    | a == b = 0
+    -- if the i is equal to b then we are done
+    | i == b = f a i b
+    -- if the i is smaller than b then we increment i
+    | i < b = (f a i b) + sumfabHlp f a (i+1) b
+    -- if the i is bigger than b then we decrement i
+    | i > b = (f a i b) + sumfabHlp f a (i-1) b
 
 
 -----------------------------------------------------------------------------------------
@@ -202,7 +290,17 @@ sumfab f a b = -2024
 
 hof :: [Integer->Integer]->(Integer->Integer)
 
-hof s = \n -> -2024
+-- just use the helper to start from 1
+hof fk = \n -> hofHlp fk n 1
+
+hofHlp :: [Integer->Integer]->Integer->Integer->Integer
+-- if the list has only one function then use the general calc
+hofHlp [f] n i = calc f n i
+-- just use the calc to calculate the currect and move to the next
+hofHlp fk@(f1:ft) n i = calc f1 n i + hofHlp ft n (i+1)
+
+calc :: (Integer->Integer)->Integer->Integer->Integer
+calc f n i = f ((n-i)+1) `div` (2^(i-1))
 
 
 
