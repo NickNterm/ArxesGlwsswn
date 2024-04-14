@@ -169,22 +169,32 @@ smoothHlp (h1:t1) k i c
 -----------------------------------------------------------------------------------------
      
 -- ASKHSH 6
--- w=”crazy”
--- [”c”,”razy”], [”c”,”r”,”azy”], [”cr”,”azy”], [”c”,”r”,”a”,”zy”], [”cr”,”a”,”zy”], [”c”,”ra”,”zy”],
--- [”cra”,”zy”], [”c”,”r”,”a”,”z”,”y”], [”cr”,”a”,”z”,”y”], [”c”,”ra”,”z”,”y”], [”cra”,”z”,”y”],
--- [”c”,”r”,”az”,”y”], [”cr”,”az”,”y”], [”c”,”raz”,”y”], [”craz”,”y”].
-
+-- Basic Info: This function is going to return all the possible partitions
+-- of a String. To do that we use the partitionHlp function that is going to
+-- get the Word (w) and then Current result (r) and return all the possible partiitons
 partition :: String->[[String]]
-partition w = partitionHlp w []
+partition w = tail(partitionHlp w [])
 
 partitionHlp :: String->[String]->[[String]]
-partitionHlp [] s = [s]
-partitionHlp w r = partitionHlpHlp w r 0 ++ [r]
+partitionHlp w r 
+    -- if the length of the word is 0 then return the result
+    -- r is going to have the splitted version of the word
+    | length w == 0 = [r]
+    -- otherwise we call the partitionHlpHlp to get all the possible
+    -- partitions of the word
+    | otherwise = partitionHlpHlp w r 1
 
+-- this function gets the Word (w) and the Current result (r)
+-- also the index (i) that is going to increment for the loop
+-- We init the i in 1
 partitionHlpHlp :: String->[String]->Int->[[String]]
 partitionHlpHlp w r i
-    | i == length w = []
-    | otherwise = partitionHlp (drop (i+1) w) (r++[take (i+1) w]) ++ partitionHlpHlp w r (i+1)
+    -- cause i starts in 1 then the max is len w + 1 that the loop breaks
+    | i == length w + 1 = []
+    -- otherwise we call the partitionHlpHlp to continue the loop and we add
+    -- the call to the partitionHlp to get the partitions of the word which is dropped by i
+    -- also here we save the (r++[take i w]) which is the current partition
+    | otherwise = partitionHlpHlp w r (i+1) ++ partitionHlp (drop i w) (r++[take i w]) 
 
     
 
