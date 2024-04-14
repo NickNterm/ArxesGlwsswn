@@ -169,26 +169,24 @@ smoothHlp (h1:t1) k i c
 -----------------------------------------------------------------------------------------
      
 -- ASKHSH 6
+-- w=”crazy”
+-- [”c”,”razy”], [”c”,”r”,”azy”], [”cr”,”azy”], [”c”,”r”,”a”,”zy”], [”cr”,”a”,”zy”], [”c”,”ra”,”zy”],
+-- [”cra”,”zy”], [”c”,”r”,”a”,”z”,”y”], [”cr”,”a”,”z”,”y”], [”c”,”ra”,”z”,”y”], [”cra”,”z”,”y”],
+-- [”c”,”r”,”az”,”y”], [”cr”,”az”,”y”], [”c”,”raz”,”y”], [”craz”,”y”].
 
 partition :: String->[[String]]
-partition w =  split w
+partition w = partitionHlp w []
 
-split :: String->[String]
-split (a:b:t) = (a:r,b:s)
-    where [r,s] = split t
-split s = [s,""]
+partitionHlp :: String->[String]->[[String]]
+partitionHlp [] s = [s]
+partitionHlp w r = partitionHlpHlp w r 0 ++ [r]
 
-partitionHlp :: String->Int->[[String]]
-partitionHlp w k
-    | k == length w = [[w]]
-    | k > length w = [[w]]
-    | otherwise = [partitionHlp2 (take k w) (drop k w) k] ++ partitionHlp w (k+1)
+partitionHlpHlp :: String->[String]->Int->[[String]]
+partitionHlpHlp w r i
+    | i == length w = []
+    | otherwise = partitionHlp (drop (i+1) w) (r++[take (i+1) w]) ++ partitionHlpHlp w r (i+1)
 
-partitionHlp2 :: String->String->Int->[String]
-partitionHlp2 s w k
-    | k == length w = [w]
-    | k > length w = [w]
-    | otherwise = s:(take k w):[drop k w] ++ partitionHlp2 s w (k+1)
+    
 
 -----------------------------------------------------------------------------------------
 
