@@ -135,7 +135,7 @@ deleteIntIHlp (h1:t1) (h2:t2) i
     -- if it is we delete it 
     | i == h2 = deleteIntIHlp t1 t2 (i+1)
     -- else skip this index
-    | otherwise = h2:deleteIntIHlp t1 (h2:t2) (i+1)
+    | otherwise = h1:deleteIntIHlp t1 (h2:t2) (i+1)
 
 
 -----------------------------------------------------------------------------------------
