@@ -128,7 +128,7 @@ deleteIntI s r = deleteIntIHlp s r 1
 deleteIntIHlp :: [Int]->[Int]->Int->[Int]
 -- if the r list is empty then we return the s list
 deleteIntIHlp s [] i = s
--- if the s list is empty then we again return the s list
+-- if the s list is empty then we again return thes list
 deleteIntIHlp [] r i = []
 -- Else we check if the i element is on the r list
 deleteIntIHlp (h1:t1) (h2:t2) i
